@@ -52,8 +52,9 @@ export default function TodayPage() {
 
   useEffect(() => {
     if (!supabase) return;
+    const client = supabase;
 
-    supabase.auth.getSession().then(async ({ data }) => {
+    client.auth.getSession().then(async ({ data }) => {
       if (!data.session) {
         router.replace("/login");
         return;
@@ -62,14 +63,14 @@ export default function TodayPage() {
       const uid = data.session.user.id;
       setUserId(uid);
 
-      const promptRow = await ensureDailyPrompt(today);
+      const promptRow = await ensureDailyPrompt(client, today);
       if (!promptRow) {
         setStatus("Could not load today's prompt. Please run schema.sql in Supabase.");
         return;
       }
       setPrompt(promptRow);
 
-      const { data: existing } = await supabase
+      const { data: existing } = await client
         .from("entries")
         .select("id, content")
         .eq("user_id", uid)
@@ -158,10 +159,11 @@ export default function TodayPage() {
   );
 }
 
-async function ensureDailyPrompt(today: string): Promise<Prompt | null> {
-  if (!supabase) return null;
-
-  const existing = await supabase
+async function ensureDailyPrompt(
+  client: NonNullable<typeof supabase>,
+  today: string
+): Promise<Prompt | null> {
+  const existing = await client
     .from("prompts")
     .select("id, prompt_date, title, body, source")
     .eq("prompt_date", today)
@@ -173,7 +175,7 @@ async function ensureDailyPrompt(today: string): Promise<Prompt | null> {
   }
 
   const body = promptForDate(today);
-  const inserted = await supabase
+  const inserted = await client
     .from("prompts")
     .insert({
       prompt_date: today,
@@ -187,7 +189,7 @@ async function ensureDailyPrompt(today: string): Promise<Prompt | null> {
   if (inserted.data) return inserted.data as Prompt;
 
   // Handle race: another user inserted first.
-  const retry = await supabase
+  const retry = await client
     .from("prompts")
     .select("id, prompt_date, title, body, source")
     .eq("prompt_date", today)

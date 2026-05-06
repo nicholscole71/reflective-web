@@ -16,6 +16,14 @@ type Entry = {
   } | null;
 };
 
+type RawEntry = {
+  id: string;
+  entry_date: string;
+  content: string;
+  created_at: string;
+  prompt: { title: string; body: string }[] | null;
+};
+
 export default function EntriesPage() {
   const router = useRouter();
   const [entries, setEntries] = useState<Entry[]>([]);
@@ -24,15 +32,16 @@ export default function EntriesPage() {
 
   useEffect(() => {
     if (!supabase) return;
+    const client = supabase;
 
-    supabase.auth.getSession().then(async ({ data }) => {
+    client.auth.getSession().then(async ({ data }) => {
       if (!data.session) {
         router.replace("/login");
         return;
       }
 
       const uid = data.session.user.id;
-      const { data: rows, error: listError } = await supabase
+      const { data: rows, error: listError } = await client
         .from("entries")
         .select("id, entry_date, content, created_at, prompt:prompts(title, body)")
         .eq("user_id", uid)
@@ -41,7 +50,14 @@ export default function EntriesPage() {
       if (listError) {
         setError(listError.message);
       } else {
-        setEntries(rows ?? []);
+        const mapped: Entry[] = ((rows as RawEntry[] | null) ?? []).map((row) => ({
+          id: row.id,
+          entry_date: row.entry_date,
+          content: row.content,
+          created_at: row.created_at,
+          prompt: row.prompt?.[0] ?? null,
+        }));
+        setEntries(mapped);
       }
       setLoading(false);
     });
