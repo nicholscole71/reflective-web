@@ -4,24 +4,13 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import TopNav from "@/components/TopNav";
 import { hasSupabaseEnv, supabase } from "@/lib/supabaseClient";
+import { getDailyPrompt } from "@/lib/dailyPrompts";
 
 type Entry = {
   id: string;
   entry_date: string;
   content: string;
   created_at: string;
-  prompt: {
-    title: string;
-    body: string;
-  } | null;
-};
-
-type RawEntry = {
-  id: string;
-  entry_date: string;
-  content: string;
-  created_at: string;
-  prompt: { title: string; body: string }[] | null;
 };
 
 export default function EntriesPage() {
@@ -43,21 +32,14 @@ export default function EntriesPage() {
       const uid = data.session.user.id;
       const { data: rows, error: listError } = await client
         .from("entries")
-        .select("id, entry_date, content, created_at, prompt:prompts(title, body)")
+        .select("id, entry_date, content, created_at")
         .eq("user_id", uid)
         .order("entry_date", { ascending: false });
 
       if (listError) {
         setError(listError.message);
       } else {
-        const mapped: Entry[] = ((rows as RawEntry[] | null) ?? []).map((row) => ({
-          id: row.id,
-          entry_date: row.entry_date,
-          content: row.content,
-          created_at: row.created_at,
-          prompt: row.prompt?.[0] ?? null,
-        }));
-        setEntries(mapped);
+        setEntries((rows as Entry[] | null) ?? []);
       }
       setLoading(false);
     });
@@ -86,9 +68,12 @@ export default function EntriesPage() {
           {entries.map((entry) => (
             <li key={entry.id} className="calm-card p-5">
               <p className="text-xs tracking-wide text-stone-500">{entry.entry_date}</p>
-              {entry.prompt?.title && (
-                <p className="mt-2 text-sm font-medium text-stone-800">{entry.prompt.title}</p>
-              )}
+              <p className="mt-2 text-sm font-medium text-stone-800">
+                {getDailyPrompt(entry.entry_date).title}
+              </p>
+              <p className="mt-1 text-xs uppercase tracking-wide text-stone-500">
+                {getDailyPrompt(entry.entry_date).category}
+              </p>
               <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-stone-800">
                 {entry.content}
               </p>

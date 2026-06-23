@@ -4,24 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import TopNav from "@/components/TopNav";
 import { hasSupabaseEnv, supabase } from "@/lib/supabaseClient";
-
-type Prompt = {
-  id: string;
-  prompt_date: string;
-  title: string;
-  body: string;
-  source: string;
-};
-
-const CURATED_PROMPTS = [
-  "What belief have you never seriously questioned, and what might challenge it?",
-  "What emotion keeps showing up lately, and what is it trying to protect?",
-  "If someone you disagree with explained their view kindly, what would they say?",
-  "What invisible standard are you using to judge yourself this week?",
-  "What are you avoiding right now, and what fear sits beneath that avoidance?",
-  "What would your future self thank you for beginning today, even imperfectly?",
-  "What small kindness would make today feel more human for you or someone else?",
-];
+import { getDailyPrompt } from "@/lib/dailyPrompts";
 
 function localDateString() {
   const d = new Date();
@@ -31,24 +14,15 @@ function localDateString() {
   return `${yyyy}-${mm}-${dd}`;
 }
 
-function promptForDate(date: string) {
-  let hash = 2166136261;
-  for (let i = 0; i < date.length; i++) {
-    hash ^= date.charCodeAt(i);
-    hash = Math.imul(hash, 16777619);
-  }
-  return CURATED_PROMPTS[(hash >>> 0) % CURATED_PROMPTS.length];
-}
-
 export default function TodayPage() {
   const router = useRouter();
   const [userId, setUserId] = useState<string | null>(null);
-  const [prompt, setPrompt] = useState<Prompt | null>(null);
   const [entryId, setEntryId] = useState<string | null>(null);
   const [content, setContent] = useState("");
   const [status, setStatus] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const today = useMemo(() => localDateString(), []);
+  const prompt = useMemo(() => getDailyPrompt(today), [today]);
 
   useEffect(() => {
     if (!supabase) return;
@@ -63,18 +37,11 @@ export default function TodayPage() {
       const uid = data.session.user.id;
       setUserId(uid);
 
-      const promptRow = await ensureDailyPrompt(client, today);
-      if (!promptRow) {
-        setStatus("Could not load today's prompt. Please run schema.sql in Supabase.");
-        return;
-      }
-      setPrompt(promptRow);
-
       const { data: existing } = await client
         .from("entries")
         .select("id, content")
         .eq("user_id", uid)
-        .eq("prompt_id", promptRow.id)
+        .eq("entry_date", today)
         .maybeSingle();
 
       if (existing) {
@@ -85,14 +52,13 @@ export default function TodayPage() {
   }, [router, today]);
 
   const onSave = async () => {
-    if (!supabase || !userId || !prompt) return;
+    if (!supabase || !userId) return;
     setSaving(true);
     setStatus(null);
 
     const payload = {
       user_id: userId,
       entry_date: today,
-      prompt_id: prompt.id,
       content,
     };
 
@@ -120,10 +86,21 @@ export default function TodayPage() {
         <section className="calm-card p-6 sm:p-7">
           <p className="text-xs tracking-[0.2em] text-stone-500 uppercase">Today</p>
           <h1 className="mt-3 text-2xl leading-8 font-medium text-stone-800">
-            {prompt?.title ?? "Daily reflection"}
+            {prompt.title}
           </h1>
           <p className="mt-3 text-base leading-7 text-stone-700">
-            {prompt?.body ?? "Loading prompt..."}
+            {prompt.description}
+          </p>
+          <p className="mt-3 text-sm tracking-wide uppercase text-stone-500">
+            Category: {prompt.category}
+          </p>
+          <p className="mt-4 rounded-xl border border-[#dfe3da] bg-[#ffffffc9] px-4 py-3 text-sm leading-7 text-stone-700">
+            <span className="font-medium text-stone-800">Reflection question:</span>{" "}
+            {prompt.reflection_question}
+          </p>
+          <p className="mt-3 rounded-xl border border-[#dfe3da] bg-[#ffffffc9] px-4 py-3 text-sm leading-7 text-stone-700">
+            <span className="font-medium text-stone-800">Experiment for today:</span>{" "}
+            {prompt.experiment}
           </p>
           <p className="calm-note mt-3">
             Let yourself answer slowly. Clarity matters more than completeness.
@@ -157,43 +134,4 @@ export default function TodayPage() {
       </main>
     </div>
   );
-}
-
-async function ensureDailyPrompt(
-  client: NonNullable<typeof supabase>,
-  today: string
-): Promise<Prompt | null> {
-  const existing = await client
-    .from("prompts")
-    .select("id, prompt_date, title, body, source")
-    .eq("prompt_date", today)
-    .maybeSingle();
-
-  if (existing.data) return existing.data as Prompt;
-  if (existing.error && existing.error.code !== "PGRST116") {
-    return null;
-  }
-
-  const body = promptForDate(today);
-  const inserted = await client
-    .from("prompts")
-    .insert({
-      prompt_date: today,
-      title: "Daily reflection",
-      body,
-      source: "curated",
-    })
-    .select("id, prompt_date, title, body, source")
-    .single();
-
-  if (inserted.data) return inserted.data as Prompt;
-
-  // Handle race: another user inserted first.
-  const retry = await client
-    .from("prompts")
-    .select("id, prompt_date, title, body, source")
-    .eq("prompt_date", today)
-    .maybeSingle();
-
-  return (retry.data as Prompt | null) ?? null;
 }
