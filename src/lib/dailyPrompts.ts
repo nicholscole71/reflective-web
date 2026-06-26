@@ -102,7 +102,7 @@ export const PROMPT_LIBRARY: DailyPrompt[] = [
       'Write one worry in two columns: "Can control" and "Cannot control." Take one action from the first column today.',
   },
   {
-    title: "Default Settings",
+    title: "Stress Defaults",
     category: "Psychology",
     description:
       "Under stress, people fall back to default patterns: avoid, people-please, over-explain, shut down, or get controlling. These defaults feel automatic because they are familiar, not because they are best. Noticing your default gives you a chance to choose a better pattern in real time.",

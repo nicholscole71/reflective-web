@@ -122,7 +122,7 @@ export default function TodayPage() {
                 disabled={saving || !hasSupabaseEnv}
                 className="journal-btn"
               >
-                {saving ? "saving..." : "save entry"}
+                {saving ? "Saving..." : "Save Entry"}
               </button>
               {status && <span className="journal-status">{status}</span>}
             </div>

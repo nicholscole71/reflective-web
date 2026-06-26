@@ -68,7 +68,7 @@ export default function LoginPage() {
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="journal-input min-h-0 py-3"
+            className="journal-field"
           />
           <input
             type="password"
@@ -76,7 +76,7 @@ export default function LoginPage() {
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="journal-input min-h-0 py-3"
+            className="journal-field"
           />
 
           <div className="flex gap-2 pt-2">
@@ -86,7 +86,7 @@ export default function LoginPage() {
               onClick={(e) => void onSubmit(e, "login")}
               className="journal-btn flex-1 disabled:opacity-60"
             >
-              {loading ? "working..." : "log in"}
+              {loading ? "Working..." : "Log In"}
             </button>
             <button
               type="submit"
@@ -94,7 +94,7 @@ export default function LoginPage() {
               onClick={(e) => void onSubmit(e, "signup")}
               className="flex-1 rounded-[14px] border border-[var(--line)] bg-[rgba(255,255,255,0.02)] px-4 py-2.5 text-sm font-semibold text-[#F6F1EB] transition hover:scale-[1.02] hover:bg-[rgba(255,255,255,0.05)] disabled:opacity-60"
             >
-              sign up
+              Sign Up
             </button>
           </div>
         </form>

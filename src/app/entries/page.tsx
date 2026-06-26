@@ -23,9 +23,9 @@ type DayRow = {
   createdAt: string | null;
 };
 
-function dateStringFromNow(daysBack: number) {
+function dateStringFromOffset(daysOffset: number) {
   const d = new Date();
-  d.setDate(d.getDate() - daysBack);
+  d.setDate(d.getDate() + daysOffset);
   const yyyy = d.getFullYear();
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
@@ -55,7 +55,7 @@ export default function EntriesPage() {
   const [loading, setLoading] = useState(hasSupabaseEnv);
   const [error, setError] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-  const [selectedDate, setSelectedDate] = useState<string>(dateStringFromNow(0));
+  const [selectedDate, setSelectedDate] = useState<string>(dateStringFromOffset(0));
   const [draftByDate, setDraftByDate] = useState<Record<string, string>>({});
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -89,8 +89,9 @@ export default function EntriesPage() {
 
   const archiveRows = useMemo<DayRow[]>(() => {
     const byDate = new Map(entries.map((e) => [e.entry_date, e]));
-    return Array.from({ length: 35 }, (_, i) => {
-      const date = dateStringFromNow(i);
+    // Show today + next 30 days so new users do not see old history.
+    return Array.from({ length: 31 }, (_, i) => {
+      const date = dateStringFromOffset(i);
       const prompt = getDailyPrompt(date);
       const entry = byDate.get(date);
       const content = entry?.content ?? "";
@@ -253,7 +254,7 @@ export default function EntriesPage() {
                     disabled={saving || !hasSupabaseEnv}
                     className="journal-btn"
                   >
-                    {saving ? "saving..." : "save entry"}
+                    {saving ? "Saving..." : "Save Entry"}
                   </button>
                   {saveStatus && <span className="journal-status">{saveStatus}</span>}
                 </div>

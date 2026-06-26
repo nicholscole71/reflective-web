@@ -27,13 +27,13 @@ export default function TopNav() {
             href="/today"
             className={`border-b pb-1.5 transition-colors duration-200 ${active("/today")}`}
           >
-            today
+            Today
           </Link>
           <Link
             href="/entries"
             className={`border-b pb-1.5 transition-colors duration-200 ${active("/entries")}`}
           >
-            entries
+            Entries
           </Link>
         </div>
         <button
@@ -41,7 +41,7 @@ export default function TopNav() {
           onClick={onSignOut}
           className="text-sm tracking-[0.1em] uppercase text-[#C7BEB6] transition hover:text-[#F6F1EB]"
         >
-          sign out
+          Sign Out
         </button>
       </div>
     </header>
