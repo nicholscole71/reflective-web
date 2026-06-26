@@ -46,16 +46,17 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="calm-shell mx-auto flex min-h-screen w-full max-w-md items-center px-5">
-      <section className="calm-card w-full p-7 sm:p-8">
-        <p className="text-xs tracking-[0.2em] text-stone-500 uppercase">Reflective</p>
-        <h1 className="mt-3 text-2xl leading-8 font-medium text-stone-800">
+    <main className="journal-shell mx-auto flex min-h-screen w-full max-w-md items-center px-5 page-enter">
+      <section className="journal-glow journal-glow-soft w-full">
+        <div className="journal-card w-full p-7 sm:p-8">
+        <p className="text-xs tracking-[0.24em] uppercase text-[#C7BEB6]">Reflective</p>
+        <h1 className="journal-title mt-4 text-[clamp(1.9rem,4vw,2.5rem)]">
           A quiet space for deeper thought
         </h1>
-        <p className="calm-note mt-3">Sign in to continue your daily reflection.</p>
+        <p className="journal-subtitle mt-3">Sign in to continue your daily reflection.</p>
 
         {!hasSupabaseEnv && (
-          <p className="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          <p className="mt-5 rounded-xl border border-[#7b5b3e] bg-[rgba(179,138,90,0.12)] px-4 py-3 text-sm text-[#f0d6b8]">
             Missing env vars: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY
           </p>
         )}
@@ -67,7 +68,7 @@ export default function LoginPage() {
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="calm-input"
+            className="journal-input min-h-0 py-3"
           />
           <input
             type="password"
@@ -75,7 +76,7 @@ export default function LoginPage() {
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="calm-input"
+            className="journal-input min-h-0 py-3"
           />
 
           <div className="flex gap-2 pt-2">
@@ -83,7 +84,7 @@ export default function LoginPage() {
               type="submit"
               disabled={loading || !hasSupabaseEnv}
               onClick={(e) => void onSubmit(e, "login")}
-              className="calm-primary-btn flex-1 disabled:opacity-60"
+              className="journal-btn flex-1 disabled:opacity-60"
             >
               {loading ? "working..." : "log in"}
             </button>
@@ -91,14 +92,15 @@ export default function LoginPage() {
               type="submit"
               disabled={loading || !hasSupabaseEnv}
               onClick={(e) => void onSubmit(e, "signup")}
-              className="calm-secondary-btn flex-1 disabled:opacity-60"
+              className="flex-1 rounded-[14px] border border-[var(--line)] bg-[rgba(255,255,255,0.02)] px-4 py-2.5 text-sm font-semibold text-[#F6F1EB] transition hover:scale-[1.02] hover:bg-[rgba(255,255,255,0.05)] disabled:opacity-60"
             >
               sign up
             </button>
           </div>
         </form>
 
-        {message && <p className="calm-note mt-4">{message}</p>}
+        {message && <p className="journal-status mt-4">{message}</p>}
+        </div>
       </section>
     </main>
   );

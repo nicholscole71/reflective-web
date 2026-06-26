@@ -1,79 +1,287 @@
 @import "tailwindcss";
 
 :root {
-  --font-sans: var(--font-geist-sans);
-  --bg-0: #f7f6f2;
-  --bg-1: #f0eee8;
-  --text-0: #2f352f;
-  --text-1: #5f675f;
-  --line: #dfe3da;
-  --card: #fffffd;
-  --sage-0: #7e9180;
-  --sage-1: #6b7f6d;
+  --bg-0: #1b1714;
+  --bg-1: #241e1a;
+  --card-0: #2a231e;
+  --card-1: #342c25;
+  --text-0: #f6f1eb;
+  --text-1: #c7beb6;
+  --accent: #b38a5a;
+  --line: rgba(255, 255, 255, 0.06);
+  --measure: 68ch;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   color: var(--text-0);
   background:
-    radial-gradient(1100px 600px at 10% -20%, #ffffffaa, transparent 70%),
-    radial-gradient(900px 500px at 100% 0%, #e8efe8aa, transparent 70%),
+    radial-gradient(1100px 700px at 50% -20%, rgba(179, 138, 90, 0.15), transparent 70%),
+    radial-gradient(800px 500px at 95% 10%, rgba(255, 210, 160, 0.06), transparent 70%),
+    radial-gradient(700px 450px at 5% 95%, rgba(110, 80, 58, 0.12), transparent 70%),
     linear-gradient(160deg, var(--bg-0), var(--bg-1));
-}
-
-.calm-shell {
+  position: relative;
   min-height: 100vh;
 }
 
-.calm-card {
-  border: 1px solid var(--line);
-  background: linear-gradient(180deg, #ffffffd9, #ffffffe8);
-  border-radius: 20px;
-  box-shadow:
-    0 8px 28px rgba(24, 30, 24, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.012) 0px,
+      rgba(255, 255, 255, 0.012) 1px,
+      transparent 1px,
+      transparent 2px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.008) 0px,
+      rgba(255, 255, 255, 0.008) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+  opacity: 0.3;
 }
 
-.calm-input {
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 45%, rgba(0, 0, 0, 0.34) 100%);
+}
+
+.journal-shell {
+  min-height: 100vh;
+  animation: fadeIn 280ms ease;
+}
+
+.journal-main {
+  margin: 0 auto;
   width: 100%;
-  border-radius: 14px;
+  max-width: 1040px;
+  padding: clamp(2.2rem, 5vw, 4.4rem) clamp(1.05rem, 3vw, 1.7rem);
+}
+
+.journal-glow {
+  position: relative;
+}
+
+.journal-glow::before {
+  content: "";
+  position: absolute;
+  inset: -40px -50px;
+  z-index: -1;
+  background: radial-gradient(circle at 50% 30%, rgba(179, 138, 90, 0.24), transparent 68%);
+  filter: blur(12px);
+}
+
+.journal-glow-soft::before {
+  background: radial-gradient(circle at 50% 30%, rgba(179, 138, 90, 0.14), transparent 68%);
+}
+
+.journal-glow-strong::before {
+  background: radial-gradient(circle at 50% 28%, rgba(179, 138, 90, 0.32), transparent 70%);
+  filter: blur(14px);
+}
+
+.journal-card {
   border: 1px solid var(--line);
-  background: var(--card);
-  padding: 0.72rem 0.9rem;
+  background: linear-gradient(180deg, rgba(52, 44, 37, 0.96), rgba(42, 35, 30, 0.98));
+  border-radius: 26px;
+  box-shadow:
+    0 22px 80px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(6px);
+}
+
+.journal-title {
+  font-family: var(--font-serif), "Times New Roman", serif;
+  font-size: clamp(2.05rem, 4.2vw, 3.25rem);
+  line-height: 1.08;
+  letter-spacing: 0.008em;
+  font-weight: 600;
   color: var(--text-0);
+  text-wrap: balance;
+}
+
+.journal-subtitle {
+  color: var(--text-1);
+  font-size: clamp(0.98rem, 1.3vw, 1.04rem);
+  line-height: 1.72rem;
+  max-width: var(--measure);
+}
+
+.journal-divider {
+  border-top: 1px solid var(--line);
+  margin: 1.5rem 0 1.4rem;
+}
+
+.journal-label {
+  font-family: var(--font-serif), "Times New Roman", serif;
+  letter-spacing: 0.02em;
+  color: #e5d7c8;
+  font-size: clamp(1.18rem, 2vw, 1.32rem);
+}
+
+.journal-body {
+  color: var(--text-1);
+  font-size: 1.02rem;
+  line-height: 1.9rem;
+}
+
+.journal-input {
+  width: 100%;
+  min-height: 390px;
+  border-radius: 24px;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(180deg, rgba(27, 23, 20, 0.78), rgba(27, 23, 20, 0.88)),
+    radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.02), transparent 45%);
+  padding: 1.3rem 1.35rem;
+  color: var(--text-0);
+  font-size: 1.02rem;
+  line-height: 2rem;
   outline: none;
+  transition: border-color 260ms ease, box-shadow 260ms ease, transform 240ms ease;
+  resize: vertical;
 }
 
-.calm-input:focus {
-  border-color: var(--sage-1);
-  box-shadow: 0 0 0 3px rgba(126, 145, 128, 0.15);
+.journal-input::placeholder {
+  color: rgba(199, 190, 182, 0.62);
+  white-space: pre-line;
 }
 
-.calm-primary-btn {
+.journal-input:focus {
+  border-color: rgba(179, 138, 90, 0.62);
+  box-shadow: 0 0 0 4px rgba(179, 138, 90, 0.14);
+  transform: translateY(-1px);
+}
+
+.journal-btn {
   border-radius: 14px;
-  background: linear-gradient(180deg, var(--sage-0), var(--sage-1));
-  color: #f4f8f4;
-  padding: 0.68rem 1rem;
+  background: linear-gradient(180deg, #bf9768, #a77c49);
+  color: #f8f2ec;
+  padding: 0.65rem 1rem;
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
+  transition: transform 220ms ease, filter 220ms ease;
 }
 
-.calm-primary-btn:hover {
-  filter: brightness(0.98);
+.journal-btn:hover {
+  transform: scale(1.02);
+  filter: brightness(1.04);
 }
 
-.calm-secondary-btn {
-  border-radius: 14px;
-  border: 1px solid var(--line);
-  background: #ffffffc9;
-  color: var(--text-0);
-  padding: 0.68rem 1rem;
-  font-size: 0.9rem;
-  font-weight: 500;
+.journal-btn:disabled {
+  opacity: 0.6;
+  transform: none;
+  filter: none;
 }
 
-.calm-note {
+.journal-status {
   color: var(--text-1);
   font-size: 0.92rem;
-  line-height: 1.45rem;
+}
+
+.page-enter {
+  animation: enterUp 300ms ease;
+}
+
+.archive-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(179, 138, 90, 0.45) transparent;
+}
+
+.archive-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.archive-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.archive-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(179, 138, 90, 0.56), rgba(119, 88, 58, 0.5));
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+@media (max-width: 900px) {
+  .journal-card {
+    border-radius: 24px;
+  }
+
+  .journal-input {
+    min-height: 320px;
+  }
+}
+
+@media (max-width: 640px) {
+  .journal-main {
+    padding: 1.4rem 0.95rem 2rem;
+  }
+
+  .journal-card {
+    border-radius: 22px;
+  }
+
+  .journal-title {
+    font-size: clamp(1.82rem, 8vw, 2.2rem);
+    line-height: 1.12;
+  }
+
+  .journal-subtitle {
+    font-size: 0.96rem;
+    line-height: 1.62rem;
+  }
+
+  .journal-input {
+    min-height: 280px;
+    border-radius: 20px;
+    font-size: 0.98rem;
+    line-height: 1.8rem;
+    padding: 1rem 1.05rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journal-shell,
+  .page-enter {
+    animation: none;
+  }
+
+  .journal-btn,
+  .journal-input {
+    transition: none;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes enterUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
